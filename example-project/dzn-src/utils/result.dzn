@@ -1,0 +1,24 @@
+extern string $std::string$;
+extern Error $Dzn::Error$;
+
+$#include "types/Error.hpp"$
+
+// Enumeration describing result of a call
+enum Result
+{
+    Ok,
+    Error
+};
+
+// Definition of injectable interface containing helper functions to modify our error object
+interface ErrorHelper
+{
+    in void AddMessage(inout Error error, in string message);
+    in void Clear(inout Error error);
+
+    behavior
+    {
+        on AddMessage: {}
+        on Clear: {}
+    }
+}

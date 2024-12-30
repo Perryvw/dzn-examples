@@ -1,0 +1,80 @@
+import components/IDoor.dzn;
+import external/IDoorExternal.dzn;
+
+import utils/timer.dzn;
+
+component DoorArmor
+{
+    provides IDoor strict;
+    requires IDoorExternal unsafe;
+
+    requires ITimer timer;
+
+    requires injected ErrorHelper errorHelper;
+
+    behavior
+    {
+        on strict.Open(error):
+        {
+            if (unsafe.Open(error) == Result.Ok)
+            {
+                timer.Start($std::chrono::seconds(60)$);
+                reply(Result.Ok);
+            }
+            else
+            {
+                reply(Result.Error);
+            }
+        }
+
+        on strict.Close(error):
+        {
+            if (unsafe.Close(error) == Result.Ok)
+            {
+                timer.Start($std::chrono::seconds(60)$);
+                reply(Result.Ok);
+            }
+            else
+            {
+                reply(Result.Error);
+            }
+        }
+
+        on unsafe.Opened():
+        {
+            [strict.state.Opening]
+            {
+                timer.Cancel();
+                strict.Opened();
+            }
+            [otherwise] {}
+        }
+
+        on unsafe.Closed():
+        {
+            [strict.state.Closing]
+            {
+                timer.Cancel();
+                strict.Closed();
+            }
+            [otherwise] {}
+        }
+
+        on unsafe.Fail(error):
+        {
+            [strict.state.Opening || strict.state.Closing]
+            {
+                timer.Cancel();
+                strict.Fail(error);
+            }
+            [otherwise] {}
+        }
+
+        on timer.Timeout():
+        {
+            Error error;
+            errorHelper.AddMessage(error, $"Timeout waiting for the door hardware"$);
+            strict.Fail(error);
+        }
+    }
+}

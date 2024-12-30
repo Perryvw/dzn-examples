@@ -1,0 +1,63 @@
+import utils/result.dzn;
+
+interface IVacuum
+{
+    in Result Vent(out Error error);
+    in Result Evacuate(out Error error);
+
+    out void Evacuated();
+    out void Vented();
+    out void Fail(in Error error);
+
+    behavior
+    {
+        enum State
+        {
+            Unknown,
+            Evacuating,
+            Vacuum,
+            Venting,
+            Ambient
+        };
+        State state = State.Unknown;
+
+        [state.Unknown]
+        {
+            on Evacuate: { state = State.Evacuating; reply(Result.Ok); }
+            on Evacuate: { reply(Result.Error); }
+
+            on Vent: { state = State.Venting; reply(Result.Ok); }
+            on Vent: { reply(Result.Error); }
+        }
+
+        [state.Vacuum]
+        {
+            on Evacuate: { state = State.Evacuating; reply(Result.Ok); }
+            on Evacuate: { reply(Result.Error); }
+
+            on Vent: { state = State.Venting; reply(Result.Ok); }
+            on Vent: { reply(Result.Error); }
+        }
+
+        [state.Ambient]
+        {
+            on Evacuate: { state = State.Evacuating; reply(Result.Ok); }
+            on Evacuate: { reply(Result.Error); }
+
+            on Vent: { state = State.Venting; reply(Result.Ok); }
+            on Vent: { reply(Result.Error); }
+        }
+
+        [state.Evacuating]
+        {
+            on optional: { Evacuated; state = State.Vacuum; }
+            on inevitable: { Fail; state = State.Unknown; }
+        }
+
+        [state.Venting]
+        {
+            on optional: { Vented; state = State.Ambient; }
+            on inevitable: { Fail; state = State.Unknown; }
+        }
+    }
+}

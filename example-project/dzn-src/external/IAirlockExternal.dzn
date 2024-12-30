@@ -1,0 +1,16 @@
+import utils/promise.dzn;
+
+interface IAirlockExternal
+{
+    in void TransitionToInsideOpen(out Future future);
+    in void TransitionToOutsideOpen(out Future future);
+
+    behavior
+    {
+        on TransitionToInsideOpen: {}
+        on TransitionToInsideOpen: {}
+
+        on TransitionToOutsideOpen: {}
+        on TransitionToOutsideOpen: {}
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "format": {
+        "indent": ["spaces", 4],
+        "braces": "next-line",
+        "target_width": 120
+    }
+}

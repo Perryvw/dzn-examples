@@ -1,0 +1,24 @@
+import utils/result.dzn;
+
+interface IDoorExternal
+{
+    in Result Open(out Error error);
+    in Result Close(out Error error);
+
+    out void Opened();
+    out void Closed();
+    out void Fail(in Error error);
+
+    behavior
+    {
+        on Open: reply(Result.Ok);
+        on Open: reply(Result.Error);
+
+        on Close: reply(Result.Ok);
+        on Close: reply(Result.Error);
+
+        on optional: { Opened; }
+        on optional: { Closed; }
+        on optional: { Fail; }
+    }
+}

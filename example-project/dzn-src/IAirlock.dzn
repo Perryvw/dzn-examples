@@ -1,0 +1,53 @@
+import utils/result.dzn;
+
+interface IAirlock
+{
+    in void TransitionToInsideOpen();
+    in void TransitionToOutsideOpen();
+
+    out void InsideOpen();
+    out void OutsideOpen();
+    out void Fail(in Error error);
+
+    behavior
+    {
+        enum State
+        {
+            Unknown,
+            InsideOpen,
+            OutsideOpen,
+            Transitioning,
+        };
+        State state = State.Unknown;
+        State transitionTarget = State.Unknown;
+
+        [state.Unknown]
+        {
+            on TransitionToInsideOpen: { state = State.Transitioning; transitionTarget = State.InsideOpen; }
+
+            on TransitionToOutsideOpen: { state = State.Transitioning; transitionTarget = State.OutsideOpen; }
+        }
+
+        [state.InsideOpen]
+        {
+            on TransitionToOutsideOpen: { state = State.Transitioning; transitionTarget = State.OutsideOpen; }
+        }
+
+        [state.OutsideOpen]
+        {
+            on TransitionToInsideOpen: { state = State.Transitioning; transitionTarget = State.InsideOpen; }
+        }
+
+        [state.Transitioning && transitionTarget.InsideOpen]
+        {
+            on optional: { state = State.InsideOpen; InsideOpen; }
+            on inevitable: { state = State.Unknown; Fail; }
+        }
+
+        [state.Transitioning && transitionTarget.OutsideOpen]
+        {
+            on optional: { state = State.OutsideOpen; OutsideOpen; }
+            on inevitable: { state = State.Unknown; Fail; }
+        }
+    }
+}

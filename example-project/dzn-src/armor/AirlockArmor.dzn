@@ -1,0 +1,84 @@
+import external/IAirlockExternal.dzn;
+import IAirlock.dzn;
+
+component AirlockArmor
+{
+    provides IAirlockExternal unsafe;
+    requires IAirlock strict;
+
+    requires IPromise promise;
+
+    behavior
+    {
+        [strict.state.Unknown]
+        {
+            on unsafe.TransitionToInsideOpen(future):
+            {
+                strict.TransitionToInsideOpen();
+                promise.Start();
+                promise.CreatePending(future);
+            }
+
+            on unsafe.TransitionToOutsideOpen(future):
+            {
+                strict.TransitionToOutsideOpen();
+                promise.Start();
+                promise.CreatePending(future);
+            }
+        }
+
+        [strict.state.InsideOpen]
+        {
+            on unsafe.TransitionToInsideOpen(future):
+            {
+                promise.CreateResolved(future);
+            }
+
+            on unsafe.TransitionToOutsideOpen(future):
+            {
+                strict.TransitionToOutsideOpen();
+                promise.Start();
+                promise.CreatePending(future);
+            }
+        }
+
+        [strict.state.OutsideOpen]
+        {
+            on unsafe.TransitionToInsideOpen(future):
+            {
+                strict.TransitionToInsideOpen();
+                promise.Start();
+                promise.CreatePending(future);
+            }
+
+            on unsafe.TransitionToOutsideOpen(future):
+            {
+                promise.CreateResolved(future);
+            }
+        }
+
+        [strict.state.Transitioning]
+        {
+            on unsafe.TransitionToInsideOpen(future), unsafe.TransitionToOutsideOpen(future):
+            {
+                Error error;
+                promise.CreateFailed(error, future);
+            }
+        }
+
+        on strict.InsideOpen():
+        {
+            promise.Resolve();
+        }
+
+        on strict.OutsideOpen():
+        {
+            promise.Resolve();
+        }
+
+        on strict.Fail(error):
+        {
+            promise.Fail(error);
+        }
+    }
+}

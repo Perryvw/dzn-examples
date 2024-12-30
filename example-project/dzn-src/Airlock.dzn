@@ -1,0 +1,196 @@
+import IAirlock.dzn;
+import components/IDoor.dzn;
+import components/IVacuum.dzn;
+
+component Airlock
+{
+    provides IAirlock api;
+
+    requires IDoor doorInside;
+    requires IDoor doorOutside;
+    requires IVacuum vacuum;
+
+    behavior
+    {
+        on api.TransitionToInsideOpen():
+        {
+            // Start by making sure inside door is closed
+            Error error;
+            if (doorInside.Close(error) == Result.Error)
+            {
+                // Abort sequence on failure (asynchronously)
+                defer api.Fail(error);
+            }
+        }
+
+        [api.transitionTarget.InsideOpen]
+        {
+            // Wait for inside door to be confirmed closed
+            on doorInside.Closed():
+            {
+                // Once inside door is confirmed closed, try to close outside door
+                Error error;
+                if (doorOutside.Close(error) == Result.Error)
+                {
+                    // Abort sequence on failure
+                    api.Fail(error);
+                }
+            }
+
+            // Wait for outside door to be closed
+            on doorOutside.Closed():
+            {
+                // Proceed with evacuating vacuum
+
+                // Make verification ensure both doors are closed!
+                // Mark any state where both doors are not closed at this point illegal
+                if (!doorInside.state.Closed || !doorOutside.state.Closed) illegal;
+
+                Error error;
+                if (vacuum.Evacuate(error) == Result.Error)
+                {
+                    // Abort sequence on failure
+                    api.Fail(error);
+                }
+            }
+
+            on vacuum.Evacuated():
+            {
+                // Vacuum evacuated, move on to the next step: opening the inside door
+
+                // Use verification to ensure that before opening the outside door, the airlock is in vacuum!
+                if (!vacuum.state.Vacuum) illegal;
+
+                // Issue door command
+                Error error;
+                if (doorInside.Open(error) != Result.Ok)
+                {
+                    // If request failed, send failure to API
+                    api.Fail(error);
+                }
+            }
+
+            on doorInside.Opened():
+            {
+                // Door inside opened, we have arrived in the desired state, notify api
+                api.InsideOpen();
+            }
+
+            on doorInside.Fail(error):
+            {
+                // If other door is still closing, don't send fail yet
+                if (!doorOutside.state.Closing)
+                {
+                    // Closing inside door failed, notify api the process failed
+                    api.Fail(error);
+                }
+            }
+
+            on vacuum.Fail(error):
+            {
+                // Evacuating vacuum failed, notify api the process failed
+                api.Fail(error);
+            }
+
+            on doorOutside.Fail(error):
+            {
+                // If other door is still closing, don't send fail yet
+                if (!doorInside.state.Closing)
+                {
+                    // Opening outside door failed, notify api the process failed
+                    api.Fail(error);
+                }
+            }
+        }
+
+        on api.TransitionToOutsideOpen():
+        {
+            // Start by making sure outside door is closed
+            Error error;
+            if (doorOutside.Close(error) == Result.Error)
+            {
+                // Abort sequence on failure (asynchronously)
+                defer api.Fail(error);
+            }
+        }
+
+        [api.transitionTarget.OutsideOpen]
+        {
+            // Wait for outside door to be confirmed closed
+            on doorOutside.Closed():
+            {
+                // Once outside door is confirmed closed, try to close inside door
+                Error error;
+                if (doorInside.Close(error) == Result.Error)
+                {
+                    // Abort sequence on failure
+                    api.Fail(error);
+                }
+            }
+
+            // Wait for inside door to be closed
+            on doorInside.Closed():
+            {
+                // Proceed with venting vacuum
+
+                // Make verification ensure both doors are closed!
+                // Mark any state where both doors are not closed at this point illegal
+                if (!doorInside.state.Closed || !doorOutside.state.Closed) illegal;
+
+                Error error;
+                if (vacuum.Vent(error) == Result.Error)
+                {
+                    // Abort sequence on failure
+                    api.Fail(error);
+                }
+            }
+
+            on vacuum.Vented():
+            {
+                // Vacuum vented, move on to the next step: opening the outside door
+
+                // Use verification to ensure that before opening the outside door, the airlock is ambient pressure!
+                if (!vacuum.state.Ambient) illegal;
+
+                // Issue door command
+                Error error;
+                if (doorOutside.Open(error) != Result.Ok)
+                {
+                    api.Fail(error);
+                }
+            }
+
+            on doorOutside.Opened():
+            {
+                // Door outside opened, we have arrived in the desired state, notify api
+                api.OutsideOpen();
+            }
+
+            on doorInside.Fail(error):
+            {
+                // If other door is still closing, don't send fail yet
+                if (!doorOutside.state.Closing)
+                {
+                    // Closing inside door failed, notify api the process failed
+                    api.Fail(error);
+                }
+            }
+
+            on vacuum.Fail(error):
+            {
+                // Venting vacuum failed, notify api the process failed
+                api.Fail(error);
+            }
+
+            on doorOutside.Fail(error):
+            {
+                // If other door is still closing, don't send fail yet
+                if (!doorInside.state.Closing)
+                {
+                    // Opening outside door failed, notify api the process failed
+                    api.Fail(error);
+                }
+            }
+        }
+    }
+}

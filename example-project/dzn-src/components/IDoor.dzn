@@ -1,0 +1,63 @@
+import utils/result.dzn;
+
+interface IDoor
+{
+    in Result Open(out Error error);
+    in Result Close(out Error error);
+
+    out void Opened();
+    out void Closed();
+    out void Fail(in Error error);
+
+    behavior
+    {
+        enum State
+        {
+            Unknown,
+            Open,
+            Closed,
+            Opening,
+            Closing
+        };
+        State state = State.Unknown;
+
+        [state.Unknown]
+        {
+            on Open: { state = State.Opening; reply(Result.Ok); }
+            on Open: { reply(Result.Error); }
+
+            on Close: { state = State.Closing; reply(Result.Ok); }
+            on Close: { reply(Result.Error); }
+        }
+
+        [state.Open]
+        {
+            on Open: { state = State.Opening; reply(Result.Ok); }
+            on Open: { reply(Result.Error); }
+
+            on Close: { state = State.Closing; reply(Result.Ok); }
+            on Close: { reply(Result.Error); }
+        }
+        
+        [state.Closed]
+        {
+            on Close: { state = State.Closing; reply(Result.Ok); }
+            on Close: { reply(Result.Error); }
+
+            on Open: { state = State.Opening; reply(Result.Ok); }
+            on Open: { reply(Result.Error); }
+        }
+
+        [state.Opening]
+        {
+            on optional: { Opened; state = State.Open; }
+            on inevitable: { Fail; state = State.Unknown; }
+        }
+
+        [state.Closing]
+        {
+            on optional: { Closed; state = State.Closed; }
+            on inevitable: { Fail; state = State.Unknown; }
+        }
+    }
+}

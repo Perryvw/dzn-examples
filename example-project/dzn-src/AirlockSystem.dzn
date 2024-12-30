@@ -1,0 +1,27 @@
+import Airlock.dzn;
+import armor/AirlockArmor.dzn;
+
+component AirlockSystem
+{
+    provides IAirlockExternal api;
+
+    requires IDoor doorInside;
+    requires IDoor doorOutside;
+    requires IVacuum vacuum;
+
+    system
+    {
+        Airlock airlock;
+
+        airlock.doorInside <=> doorInside;
+        airlock.doorOutside <=> doorOutside;
+        airlock.vacuum <=> vacuum;
+
+        PromiseFC airlockPromise;
+                
+        AirlockArmor armor;
+        airlock.api <=> armor.strict;
+        armor.unsafe <=> api;
+        armor.promise <=> airlockPromise.api;
+    }
+}
