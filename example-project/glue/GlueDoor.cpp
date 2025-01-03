@@ -8,7 +8,7 @@ GlueDoor::GlueDoor(dzn::pump& pump, IDoorHardware& hardware)
 {
 }
 
-void GlueDoor::ConnectWith(IDoor &port)
+void GlueDoor::ConnectWith(IDoorExternal& port)
 {
     m_port = port;
 

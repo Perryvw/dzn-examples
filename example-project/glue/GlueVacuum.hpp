@@ -5,7 +5,7 @@
 #include <dzn/pump.hh>
 
 #include "hardware.hpp"
-#include "dzn-gen/IVacuum.hh"
+#include "dzn-gen/IVacuumExternal.hh"
 
 namespace glue {
 
@@ -14,7 +14,7 @@ public:
     explicit GlueVacuum(dzn::pump&, IVacuumHardware&);
 
     // Connect a dezyne port to our hardware
-    void ConnectWith(IVacuum& port);
+    void ConnectWith(IVacuumExternal& port);
 
 private:
     // Implementations of event handlers
@@ -23,7 +23,7 @@ private:
 
     dzn::pump& m_pump;
     IVacuumHardware& m_hardware;
-    std::optional<std::reference_wrapper<IVacuum>> m_port;
+    std::optional<std::reference_wrapper<IVacuumExternal>> m_port;
 };
 
 }

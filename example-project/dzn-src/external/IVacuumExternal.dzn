@@ -1,0 +1,24 @@
+import utils/result.dzn;
+
+interface IVacuumExternal
+{
+    in Result Vent(out Error error);
+    in Result Evacuate(out Error error);
+
+    out void Evacuated();
+    out void Vented();
+    out void Fail(in Error error);
+
+    behavior
+    {
+        on Vent: reply(Result.Ok);
+        on Vent: reply(Result.Error);
+
+        on Evacuate: reply(Result.Ok);
+        on Evacuate: reply(Result.Error);
+
+        on optional: { Evacuated; }
+        on optional: { Vented; }
+        on optional: { Fail; }
+    }
+}

@@ -5,16 +5,16 @@
 #include <dzn/pump.hh>
 
 #include "hardware.hpp"
-#include "dzn-gen/IDoor.hh"
+#include "dzn-gen/IDoorExternal.hh"
 
 namespace glue {
 
 class GlueDoor {
 public:
-    explicit GlueDoor(dzn::pump& pump, IDoorHardware&);
+    explicit GlueDoor(dzn::pump&, IDoorHardware&);
 
     // Connect a dezyne port to our hardware
-    void ConnectWith(IDoor& port);
+    void ConnectWith(IDoorExternal& port);
 
 private:
     // Implementations of event handlers
@@ -24,7 +24,7 @@ private:
     dzn::pump& m_pump;
 
     IDoorHardware& m_hardware;
-    std::optional<std::reference_wrapper<IDoor>> m_port;
+    std::optional<std::reference_wrapper<IDoorExternal>> m_port;
 };
 
 }

@@ -1,0 +1,80 @@
+import components/IVacuum.dzn;
+import external/IVacuumExternal.dzn;
+
+import utils/timer.dzn;
+
+component VacuumArmor
+{
+    provides IVacuum strict;
+    requires IVacuumExternal unsafe;
+
+    requires ITimer timer;
+
+    requires injected ErrorHelper errorHelper;
+
+    behavior
+    {
+        on strict.Evacuate(error):
+        {
+            if (unsafe.Evacuate(error) == Result.Ok)
+            {
+                timer.Start($std::chrono::seconds(60)$);
+                reply(Result.Ok);
+            }
+            else
+            {
+                reply(Result.Error);
+            }
+        }
+
+        on strict.Vent(error):
+        {
+            if (unsafe.Vent(error) == Result.Ok)
+            {
+                timer.Start($std::chrono::seconds(60)$);
+                reply(Result.Ok);
+            }
+            else
+            {
+                reply(Result.Error);
+            }
+        }
+
+        on unsafe.Evacuated():
+        {
+            [strict.state.Evacuating]
+            {
+                timer.Cancel();
+                strict.Evacuated();
+            }
+            [otherwise] {}
+        }
+
+        on unsafe.Vented():
+        {
+            [strict.state.Venting]
+            {
+                timer.Cancel();
+                strict.Vented();
+            }
+            [otherwise] {}
+        }
+
+        on unsafe.Fail(error):
+        {
+            [strict.state.Evacuating || strict.state.Venting]
+            {
+                timer.Cancel();
+                strict.Fail(error);
+            }
+            [otherwise] {}
+        }
+
+        on timer.Timeout():
+        {
+            Error error;
+            errorHelper.AddMessage(error, $"Timeout waiting for the vacuum hardware"$);
+            strict.Fail(error);
+        }
+    }
+}

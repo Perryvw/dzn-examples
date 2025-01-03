@@ -7,3 +7,6 @@ example-project/dzn-gen/
 example-project/Makefile
 .vscode/settings.json
 build/
+example-project/testexe*
+*.cmake
+*.a

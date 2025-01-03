@@ -1,21 +1,24 @@
 import Airlock.dzn;
 import armor/AirlockArmor.dzn;
+import armor/DoorArmor.dzn;
+import armor/VacuumArmor.dzn;
+import utils/timer.dzn;
 
 component AirlockSystem
 {
     provides IAirlockExternal api;
 
-    requires IDoor doorInside;
-    requires IDoor doorOutside;
-    requires IVacuum vacuum;
+    requires IDoorExternal doorInside;
+    requires IDoorExternal doorOutside;
+    requires IVacuumExternal vacuum;
 
     system
     {
         Airlock airlock;
 
-        airlock.doorInside <=> doorInside;
-        airlock.doorOutside <=> doorOutside;
-        airlock.vacuum <=> vacuum;
+        airlock.doorInside <=> doorInsideArmor.strict;
+        airlock.doorOutside <=> doorOutsideArmor.strict;
+        airlock.vacuum <=> vacuumArmor.strict;
 
         PromiseFC airlockPromise;
                 
@@ -23,5 +26,20 @@ component AirlockSystem
         airlock.api <=> armor.strict;
         armor.unsafe <=> api;
         armor.promise <=> airlockPromise.api;
+
+        DoorArmor doorInsideArmor;
+        TimerFC doorInsideTimer;
+        doorInsideArmor.unsafe <=> doorInside;
+        doorInsideArmor.timer <=> doorInsideTimer.api;
+
+        DoorArmor doorOutsideArmor;
+        TimerFC doorOutsideTimer;
+        doorOutsideArmor.unsafe <=> doorOutside;
+        doorOutsideArmor.timer <=> doorOutsideTimer.api;
+        
+        VacuumArmor vacuumArmor;
+        TimerFC vacuumTimer;
+        vacuumArmor.unsafe <=> vacuum;
+        vacuumArmor.timer <=> vacuumTimer.api;
     }
 }

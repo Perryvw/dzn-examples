@@ -8,7 +8,7 @@ GlueVacuum::GlueVacuum(dzn::pump& pump, IVacuumHardware& hardware)
 {
 }
 
-void GlueVacuum::ConnectWith(IVacuum &port)
+void GlueVacuum::ConnectWith(IVacuumExternal& port)
 {
     m_port = port;
     
