@@ -3,9 +3,9 @@
 #include "InjectedGlueBase.hpp"
 #include "dzn-gen/result.hh"
 
-namespace glue::injected {
+namespace example::glue::injected {
 
-class ErrorHelper : public InjectedGlueBase<::ErrorHelper> {
+class ErrorHelper : public InjectedGlueBase<example::dezyne::utils::ErrorHelper> {
 public:
     ErrorHelper()
     {

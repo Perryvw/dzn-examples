@@ -2,6 +2,8 @@
 
 #include "dzn-gen/timer.hh"
 
+namespace example::dezyne::utils {
+
 class TimerFC : public skel::TimerFC {
 
 public:
@@ -21,3 +23,5 @@ public:
 private:
 
 };
+
+}

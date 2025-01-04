@@ -1,16 +1,20 @@
 import components/IVacuum.dzn;
 import external/IVacuumExternal.dzn;
 
+import utils/logging.dzn;
 import utils/timer.dzn;
+
+namespace example.dezyne.armor {
 
 component VacuumArmor
 {
     provides IVacuum strict;
     requires IVacuumExternal unsafe;
 
-    requires ITimer timer;
+    requires utils.ITimer timer;
 
-    requires injected ErrorHelper errorHelper;
+    requires injected utils.ErrorHelper errorHelper;
+    requires injected utils.ILogging logging;
 
     behavior
     {
@@ -47,7 +51,10 @@ component VacuumArmor
                 timer.Cancel();
                 strict.Evacuated();
             }
-            [otherwise] {}
+            [otherwise]
+            {
+                logging.LogWarning($"Unexpected door 'Evacuated' event"$);
+            }
         }
 
         on unsafe.Vented():
@@ -57,7 +64,10 @@ component VacuumArmor
                 timer.Cancel();
                 strict.Vented();
             }
-            [otherwise] {}
+            [otherwise]
+            {
+                logging.LogWarning($"Unexpected door 'Vented' event"$);
+            }
         }
 
         on unsafe.Fail(error):
@@ -67,7 +77,10 @@ component VacuumArmor
                 timer.Cancel();
                 strict.Fail(error);
             }
-            [otherwise] {}
+            [otherwise]
+            {
+                logging.LogWarning($"Unexpected door 'Vented' event"$);
+            }
         }
 
         on timer.Timeout():
@@ -77,4 +90,6 @@ component VacuumArmor
             strict.Fail(error);
         }
     }
+}
+
 }

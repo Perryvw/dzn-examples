@@ -4,6 +4,8 @@ import armor/DoorArmor.dzn;
 import armor/VacuumArmor.dzn;
 import utils/timer.dzn;
 
+namespace example.dezyne {
+
 component AirlockSystem
 {
     provides IAirlockExternal api;
@@ -20,26 +22,28 @@ component AirlockSystem
         airlock.doorOutside <=> doorOutsideArmor.strict;
         airlock.vacuum <=> vacuumArmor.strict;
 
-        PromiseFC airlockPromise;
-                
-        AirlockArmor armor;
+        utils.PromiseFC airlockPromise;
+
+        armor.AirlockArmor armor;
         airlock.api <=> armor.strict;
         armor.unsafe <=> api;
         armor.promise <=> airlockPromise.api;
 
-        DoorArmor doorInsideArmor;
-        TimerFC doorInsideTimer;
+        armor.DoorArmor doorInsideArmor;
+        utils.TimerFC doorInsideTimer;
         doorInsideArmor.unsafe <=> doorInside;
         doorInsideArmor.timer <=> doorInsideTimer.api;
 
-        DoorArmor doorOutsideArmor;
-        TimerFC doorOutsideTimer;
+        armor.DoorArmor doorOutsideArmor;
+        utils.TimerFC doorOutsideTimer;
         doorOutsideArmor.unsafe <=> doorOutside;
         doorOutsideArmor.timer <=> doorOutsideTimer.api;
-        
-        VacuumArmor vacuumArmor;
-        TimerFC vacuumTimer;
+
+        armor.VacuumArmor vacuumArmor;
+        utils.TimerFC vacuumTimer;
         vacuumArmor.unsafe <=> vacuum;
         vacuumArmor.timer <=> vacuumTimer.api;
     }
+}
+
 }

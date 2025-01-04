@@ -21,8 +21,10 @@ add_custom_command(OUTPUT dzn-gen/IDoor.hh dzn-gen/IDoor.cc COMMAND dzn code -I 
 add_custom_command(OUTPUT dzn-gen/IDoorExternal.hh dzn-gen/IDoorExternal.cc COMMAND dzn code -I dzn-src -o dzn-gen dzn-src/external/IDoorExternal.dzn DEPENDS dzn-src/external/IDoorExternal.dzn)
 add_custom_command(OUTPUT dzn-gen/IVacuum.hh dzn-gen/IVacuum.cc COMMAND dzn code -I dzn-src -o dzn-gen dzn-src/components/IVacuum.dzn DEPENDS dzn-src/components/IVacuum.dzn)
 add_custom_command(OUTPUT dzn-gen/IVacuumExternal.hh dzn-gen/IVacuumExternal.cc COMMAND dzn code -I dzn-src -o dzn-gen dzn-src/external/IVacuumExternal.dzn DEPENDS dzn-src/external/IVacuumExternal.dzn)
+add_custom_command(OUTPUT dzn-gen/logging.hh dzn-gen/logging.cc COMMAND dzn code -I dzn-src -o dzn-gen dzn-src/utils/logging.dzn DEPENDS dzn-src/utils/logging.dzn)
 add_custom_command(OUTPUT dzn-gen/promise.hh dzn-gen/promise.cc COMMAND dzn code -I dzn-src -o dzn-gen dzn-src/utils/promise.dzn DEPENDS dzn-src/utils/promise.dzn)
 add_custom_command(OUTPUT dzn-gen/result.hh dzn-gen/result.cc COMMAND dzn code -I dzn-src -o dzn-gen dzn-src/utils/result.dzn DEPENDS dzn-src/utils/result.dzn)
+add_custom_command(OUTPUT dzn-gen/string.hh dzn-gen/string.cc COMMAND dzn code -I dzn-src -o dzn-gen dzn-src/types/string.dzn DEPENDS dzn-src/types/string.dzn)
 add_custom_command(OUTPUT dzn-gen/timer.hh dzn-gen/timer.cc COMMAND dzn code -I dzn-src -o dzn-gen dzn-src/utils/timer.dzn DEPENDS dzn-src/utils/timer.dzn)
 
 # Create lib and add sources
@@ -38,6 +40,7 @@ add_library(dzn-gen-lib STATIC
     dzn-gen/IVacuumExternal.cc
     dzn-gen/IDoor.cc
     dzn-gen/IVacuum.cc
+    dzn-gen/logging.cc
     dzn-gen/promise.cc
     dzn-gen/result.cc
     dzn-gen/timer.cc

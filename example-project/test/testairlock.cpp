@@ -69,7 +69,7 @@ protected:
 
 TEST_F(AirlockTest, TransitionToInsideOpen_Ok)
 {
-    MyAirlock airlock{AirlockDependencies{
+    example::MyAirlock airlock{example::AirlockDependencies{
         .doorInside = mockDoorInside,
         .doorOutside = mockDoorOutside,
         .vacuum = mockVacuum
@@ -83,7 +83,7 @@ TEST_F(AirlockTest, TransitionToInsideOpen_Ok)
 
 TEST_F(AirlockTest, TransitionToInsideOpen_FailureWhileEvacuating)
 {
-    MyAirlock airlock{AirlockDependencies{
+    example::MyAirlock airlock{example::AirlockDependencies{
         .doorInside = mockDoorInside,
         .doorOutside = mockDoorOutside,
         .vacuum = mockVacuum

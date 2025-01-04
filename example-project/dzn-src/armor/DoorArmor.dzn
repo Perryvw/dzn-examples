@@ -1,16 +1,20 @@
 import components/IDoor.dzn;
 import external/IDoorExternal.dzn;
 
+import utils/logging.dzn;
 import utils/timer.dzn;
+
+namespace example.dezyne.armor {
 
 component DoorArmor
 {
     provides IDoor strict;
     requires IDoorExternal unsafe;
 
-    requires ITimer timer;
+    requires utils.ITimer timer;
 
-    requires injected ErrorHelper errorHelper;
+    requires injected utils.ErrorHelper errorHelper;
+    requires injected utils.ILogging logging;
 
     behavior
     {
@@ -47,7 +51,10 @@ component DoorArmor
                 timer.Cancel();
                 strict.Opened();
             }
-            [otherwise] {}
+            [otherwise]
+            {
+                logging.LogWarning($"Unexpected door 'Opened' event"$);
+            }
         }
 
         on unsafe.Closed():
@@ -57,7 +64,10 @@ component DoorArmor
                 timer.Cancel();
                 strict.Closed();
             }
-            [otherwise] {}
+            [otherwise]
+            {
+                logging.LogWarning($"Unexpected door 'Closed' event"$);
+            }
         }
 
         on unsafe.Fail(error):
@@ -67,7 +77,10 @@ component DoorArmor
                 timer.Cancel();
                 strict.Fail(error);
             }
-            [otherwise] {}
+            [otherwise]
+            {
+                logging.LogWarning($"Unexpected door 'Fail' event"$);
+            }
         }
 
         on timer.Timeout():
@@ -77,4 +90,6 @@ component DoorArmor
             strict.Fail(error);
         }
     }
+}
+
 }

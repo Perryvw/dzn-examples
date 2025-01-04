@@ -1,12 +1,14 @@
 import external/IAirlockExternal.dzn;
 import IAirlock.dzn;
 
+namespace example.dezyne.armor {
+
 component AirlockArmor
 {
     provides IAirlockExternal unsafe;
     requires IAirlock strict;
 
-    requires IPromise promise;
+    requires utils.IPromise promise;
 
     behavior
     {
@@ -81,4 +83,6 @@ component AirlockArmor
             promise.Fail(error);
         }
     }
+}
+
 }

@@ -6,6 +6,8 @@
 
 #include "hardware.hpp"
 
+namespace example {
+
 // Forward declare so we don't pollute scope with dzn types
 class AirlockImpl;
 
@@ -28,3 +30,5 @@ public:
 private:
     std::unique_ptr<AirlockImpl> impl;
 };
+
+}

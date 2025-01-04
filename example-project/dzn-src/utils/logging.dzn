@@ -1,0 +1,19 @@
+import types/string.dzn;
+
+namespace example.dezyne.utils {
+
+interface ILogging
+{
+    in void LogInfo(in string message);
+    in void LogWarning(in string message);
+    in void LogError(in string message);
+
+    behavior
+    {
+        on LogInfo: {}
+        on LogWarning: {}
+        on LogError: {}
+    }
+}
+
+}

@@ -1,5 +1,7 @@
 import utils/result.dzn;
 
+namespace example.dezyne {
+
 interface IVacuum
 {
     in Result Vent(out Error error);
@@ -60,4 +62,6 @@ interface IVacuum
             on inevitable: { Fail; state = State.Unknown; }
         }
     }
+}
+
 }

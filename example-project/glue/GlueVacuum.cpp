@@ -1,6 +1,6 @@
 #include "GlueVacuum.hpp"
 
-namespace glue {
+namespace example::glue {
 
 GlueVacuum::GlueVacuum(dzn::pump& pump, IVacuumHardware& hardware)
     : m_pump{pump}
@@ -8,7 +8,7 @@ GlueVacuum::GlueVacuum(dzn::pump& pump, IVacuumHardware& hardware)
 {
 }
 
-void GlueVacuum::ConnectWith(IVacuumExternal& port)
+void GlueVacuum::ConnectWith(example::dezyne::IVacuumExternal& port)
 {
     m_port = port;
     

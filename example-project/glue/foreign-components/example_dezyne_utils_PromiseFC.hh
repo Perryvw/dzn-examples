@@ -2,6 +2,8 @@
 
 #include "dzn-gen/promise.hh"
 
+namespace example::dezyne::utils {
+
 class PromiseFC : public skel::PromiseFC {
 
 public:
@@ -63,3 +65,5 @@ private:
     std::future<PromiseResult> m_future;
     bool m_pending;
 };
+
+}

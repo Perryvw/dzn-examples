@@ -1,6 +1,6 @@
 #include "GlueDoor.hpp"
 
-namespace glue {
+namespace example::glue {
 
 GlueDoor::GlueDoor(dzn::pump& pump, IDoorHardware& hardware)
     : m_pump{pump}
@@ -8,7 +8,7 @@ GlueDoor::GlueDoor(dzn::pump& pump, IDoorHardware& hardware)
 {
 }
 
-void GlueDoor::ConnectWith(IDoorExternal& port)
+void GlueDoor::ConnectWith(example::dezyne::IDoorExternal& port)
 {
     m_port = port;
 

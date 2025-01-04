@@ -1,6 +1,6 @@
 #pragma once
 
-namespace glue::injected {
+namespace example::glue::injected {
 
 template<typename Port>
 class InjectedGlueBase {

@@ -1,5 +1,7 @@
 import utils/result.dzn;
 
+namespace example.dezyne {
+
 interface IAirlock
 {
     in void TransitionToInsideOpen();
@@ -50,4 +52,6 @@ interface IAirlock
             on inevitable: { state = State.Unknown; Fail; }
         }
     }
+}
+
 }

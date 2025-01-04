@@ -1,5 +1,7 @@
 import utils/result.dzn;
 
+namespace example.dezyne {
+
 interface IDoor
 {
     in Result Open(out Error error);
@@ -38,7 +40,7 @@ interface IDoor
             on Close: { state = State.Closing; reply(Result.Ok); }
             on Close: { reply(Result.Error); }
         }
-        
+
         [state.Closed]
         {
             on Close: { state = State.Closing; reply(Result.Ok); }
@@ -60,4 +62,6 @@ interface IDoor
             on inevitable: { Fail; state = State.Unknown; }
         }
     }
+}
+
 }

@@ -1,5 +1,7 @@
 extern Milliseconds $std::chrono::milliseconds$;
 
+namespace example.dezyne.utils {
+
 interface ITimer
 {
     // Start timer with a given duration in milliseconds
@@ -40,4 +42,6 @@ interface ITimer
 component TimerFC
 {
     provides ITimer api;
+}
+
 }

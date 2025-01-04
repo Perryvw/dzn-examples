@@ -10,8 +10,11 @@
 #include "glue/GlueVacuum.hpp"
 
 #include "glue/injected/ErrorHelper.hpp"
+#include "glue/injected/Logging.hpp"
 
 #include "hardware.hpp"
+
+namespace example {
 
 class AirlockImpl
 {
@@ -27,9 +30,10 @@ public:
 
         // Add injected glue to locator
         m_dzn_locator.set(m_errorHelper.port());
+        m_dzn_locator.set(m_logging.port());
 
         // Construct dezyne system
-        m_system = std::make_unique<AirlockSystem>(m_dzn_locator);
+        m_system = std::make_unique<dezyne::AirlockSystem>(m_dzn_locator);
 
         // Connect glue objects to our dezyne system
         m_doorInside.ConnectWith(m_system->doorInside);
@@ -41,7 +45,7 @@ public:
 
     std::future<std::expected<void, std::string>> TransitionToInsideOpen()
     {
-        std::shared_future<PromiseFC::PromiseResult> future;
+        std::shared_future<dezyne::utils::PromiseFC::PromiseResult> future;
 
         dzn::shell(m_dzn_pump, [this, &future]() {
             m_system->api.in.TransitionToInsideOpen(future);
@@ -59,7 +63,7 @@ public:
 
     std::future<std::expected<void, std::string>> TransitionToOutsideOpen()
     {
-        std::shared_future<PromiseFC::PromiseResult> future;
+        std::shared_future<dezyne::utils::PromiseFC::PromiseResult> future;
 
         dzn::shell(m_dzn_pump, [this, &future]()
                    { m_system->api.in.TransitionToOutsideOpen(future); });
@@ -79,13 +83,14 @@ private:
     dzn::runtime m_dzn_runtime;
     dzn::pump m_dzn_pump;
 
-    std::unique_ptr<AirlockSystem> m_system;
+    std::unique_ptr<dezyne::AirlockSystem> m_system;
 
     glue::GlueDoor m_doorInside;
     glue::GlueDoor m_doorOutside;
     glue::GlueVacuum m_vacuum;
 
     glue::injected::ErrorHelper m_errorHelper;
+    glue::injected::Logging m_logging;
 };
 
 MyAirlock::MyAirlock(AirlockDependencies dependencies)
@@ -103,4 +108,6 @@ std::future<std::expected<void, std::string>> MyAirlock::TransitionToInsideOpen(
 std::future<std::expected<void, std::string>> MyAirlock::TransitionToOutsideOpen()
 {
     return impl->TransitionToOutsideOpen();
+}
+
 }

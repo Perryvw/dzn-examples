@@ -1,5 +1,7 @@
 import utils/promise.dzn;
 
+namespace example.dezyne {
+
 interface IAirlockExternal
 {
     in void TransitionToInsideOpen(out Future future);
@@ -13,4 +15,6 @@ interface IAirlockExternal
         on TransitionToOutsideOpen: {}
         on TransitionToOutsideOpen: {}
     }
+}
+
 }

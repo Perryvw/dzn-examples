@@ -7,6 +7,8 @@ $#include <future>$
 extern DataType $std::any$;
 extern Future $std::shared_future<std::expected<std::any, Dzn::Error>>$;
 
+namespace example.dezyne.utils {
+
 interface IPromise
 {
     // Start a pending operation that we promise to resolve
@@ -15,19 +17,17 @@ interface IPromise
     // Check if this promise is currently pending or not
     in bool IsPending();
 
-
     // Create a future that is already resolved, without data
     in void CreateResolved(out Future future);
 
     // Create a future that is already resolved, with data
     in void CreateResolvedData(in DataType data, out Future future);
-    
+
     // Create a future that is already failed, with given error
     in void CreateFailed(in Error error, out Future future);
 
     // Create a future that is pending completion
     in void CreatePending(out Future future);
-
 
     // Resolve pending promise successfully without data
     in void Resolve();
@@ -40,7 +40,8 @@ interface IPromise
 
     behavior
     {
-        enum State {
+        enum State
+        {
             Inactive,
             Pending
         };
@@ -51,11 +52,8 @@ interface IPromise
         {
             on IsPending: reply(false);
 
-            on Start:
-            {
-                // Starting the operation means we promise to resolve our futures
-                state = State.Pending;
-            }
+            on Start: { // Starting the operation means we promise to resolve our futures
+                state = State.Pending; }
 
             // Non-pending futures can be created at any time, but pending futures
             // can only be handed out while our promise is pending!
@@ -67,10 +65,7 @@ interface IPromise
             on IsPending: reply(true);
 
             // Promise can be resolved in this state, causing us to go back to inactive
-            on Resolve, ResolveData, Fail:
-            {
-                state = State.Inactive;
-            }
+            on Resolve, ResolveData, Fail: { state = State.Inactive; }
 
             // In this state we can hand out pending futures!
             on CreatePending: {}
@@ -84,4 +79,6 @@ interface IPromise
 component PromiseFC
 {
     provides IPromise api;
+}
+
 }

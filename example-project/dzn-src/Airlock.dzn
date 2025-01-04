@@ -2,6 +2,8 @@ import IAirlock.dzn;
 import components/IDoor.dzn;
 import components/IVacuum.dzn;
 
+namespace example.dezyne {
+
 component Airlock
 {
     provides IAirlock api;
@@ -193,4 +195,6 @@ component Airlock
             }
         }
     }
+}
+
 }

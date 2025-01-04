@@ -1,4 +1,5 @@
-extern string $std::string$;
+import types/string.dzn;
+
 extern Error $Dzn::Error$;
 
 $#include "types/Error.hpp"$
@@ -9,6 +10,8 @@ enum Result
     Ok,
     Error
 };
+
+namespace example.dezyne.utils {
 
 // Definition of injectable interface containing helper functions to modify our error object
 interface ErrorHelper
@@ -21,4 +24,6 @@ interface ErrorHelper
         on AddMessage: {}
         on Clear: {}
     }
+}
+
 }
