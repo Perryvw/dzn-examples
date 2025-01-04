@@ -12,17 +12,16 @@
 #include "glue/injected/ErrorHelper.hpp"
 #include "glue/injected/Logging.hpp"
 
-#include "hardware.hpp"
-
 namespace example {
 
 class AirlockImpl
 {
 public:
-    explicit AirlockImpl(AirlockDependencies dependencies)
+    explicit AirlockImpl(AirlockDependencies dependencies, ILogger& logger)
         : m_doorInside{m_dzn_pump, dependencies.doorInside},
         m_doorOutside{m_dzn_pump, dependencies.doorOutside},
-        m_vacuum{m_dzn_pump, dependencies.vacuum}
+        m_vacuum{m_dzn_pump, dependencies.vacuum},
+        m_logging{logger}
     {
         // Add runtime and pump to locator
         m_dzn_locator.set(m_dzn_runtime);
@@ -93,8 +92,8 @@ private:
     glue::injected::Logging m_logging;
 };
 
-MyAirlock::MyAirlock(AirlockDependencies dependencies)
-    : impl{std::make_unique<AirlockImpl>(dependencies)}
+MyAirlock::MyAirlock(AirlockDependencies dependencies, ILogger& logger)
+    : impl{std::make_unique<AirlockImpl>(dependencies, logger)}
 {
 }
 

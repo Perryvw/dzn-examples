@@ -5,6 +5,7 @@
 #include <memory>
 
 #include "hardware.hpp"
+#include "logging.hpp"
 
 namespace example {
 
@@ -20,7 +21,7 @@ struct AirlockDependencies {
 
 class MyAirlock {
 public:
-    explicit MyAirlock(AirlockDependencies dependencies);
+    explicit MyAirlock(AirlockDependencies dependencies, ILogger& logger);
     ~MyAirlock();
 
     std::future<std::expected<void, std::string>> TransitionToInsideOpen();

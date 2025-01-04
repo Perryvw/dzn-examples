@@ -3,20 +3,22 @@
 #include "InjectedGlueBase.hpp"
 #include "dzn-gen/logging.hh"
 
+#include "logging.hpp"
+
 namespace example::glue::injected {
 
 class Logging : public InjectedGlueBase<example::dezyne::utils::ILogging> {
 public:
-    Logging()
+    Logging(ILogger& logger)
     {
-        m_port.in.LogInfo = [](const std::string&) {
-
+        m_port.in.LogInfo = [&logger](const std::string& message) {
+            logger.Info(message);
         };
-        m_port.in.LogWarning = [](const std::string&) {
-
+        m_port.in.LogWarning = [&logger](const std::string& message) {
+            logger.Warning(message);
         };
-        m_port.in.LogError = [](const std::string&) {
-
+        m_port.in.LogError = [&logger](const std::string& message) {
+            logger.Error(message);
         };
     }
 };

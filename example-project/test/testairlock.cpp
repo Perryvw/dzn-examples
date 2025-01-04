@@ -59,6 +59,12 @@ public:
     std::vector<std::function<void(VacuumState)>> observers;
 };
 
+class MockLogger : public ILogger {
+    MOCK_METHOD(void, Info, (const std::string&), (const, override));
+    MOCK_METHOD(void, Warning, (const std::string&), (const, override));
+    MOCK_METHOD(void, Error, (const std::string&), (const, override));
+};
+
 class AirlockTest : public testing::Test
 {
 protected:
@@ -69,11 +75,12 @@ protected:
 
 TEST_F(AirlockTest, TransitionToInsideOpen_Ok)
 {
+    testing::NiceMock<MockLogger> logger{};
     example::MyAirlock airlock{example::AirlockDependencies{
         .doorInside = mockDoorInside,
         .doorOutside = mockDoorOutside,
         .vacuum = mockVacuum
-    }};
+    }, logger};
 
     auto insideOpenFuture = airlock.TransitionToInsideOpen();
     auto result = insideOpenFuture.get(); // Wait for future
@@ -83,11 +90,12 @@ TEST_F(AirlockTest, TransitionToInsideOpen_Ok)
 
 TEST_F(AirlockTest, TransitionToInsideOpen_FailureWhileEvacuating)
 {
+    testing::NiceMock<MockLogger> logger{};
     example::MyAirlock airlock{example::AirlockDependencies{
         .doorInside = mockDoorInside,
         .doorOutside = mockDoorOutside,
         .vacuum = mockVacuum
-    }};
+    }, logger};
 
     // Arrange: Failure while evacuating
     EXPECT_CALL(mockVacuum, Evacuate()).WillOnce([this] {
