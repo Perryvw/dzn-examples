@@ -9,7 +9,7 @@ namespace example::glue::injected {
 
 class Logging : public InjectedGlueBase<example::dezyne::utils::ILogging> {
 public:
-    Logging(ILogger& logger)
+    explicit Logging(ILogger& logger)
     {
         m_port.in.LogInfo = [&logger](const std::string& message) {
             logger.Info(message);

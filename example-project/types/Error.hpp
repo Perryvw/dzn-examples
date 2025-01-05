@@ -16,9 +16,11 @@ namespace Dzn {
             std::stringstream ss;
 
             // Reverse iterate, first message is on top
-            for (auto& message : std::ranges::reverse_view(messages))
-            {
-                ss << message << std::endl;
+            for (int i = messages.size() - 1; i >= 0; i--) {
+                ss << messages[i];
+                if (i > 0) {
+                    ss << std::endl;
+                }
             }
 
             return ss.str();

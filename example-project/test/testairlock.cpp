@@ -60,9 +60,29 @@ public:
 };
 
 class MockLogger : public ILogger {
+    MOCK_METHOD(void, Debug, (const std::string&), (const, override));
     MOCK_METHOD(void, Info, (const std::string&), (const, override));
     MOCK_METHOD(void, Warning, (const std::string&), (const, override));
     MOCK_METHOD(void, Error, (const std::string&), (const, override));
+
+public:
+    MockLogger(): MockLogger(false) {}
+    explicit MockLogger(bool printOutput) {
+        if (printOutput) {
+            ON_CALL(*this, Debug).WillByDefault([](auto message) {
+                std::cout << message << std::endl;
+            });
+            ON_CALL(*this, Info).WillByDefault([](auto message) {
+                std::cout << message << std::endl;
+            });
+            ON_CALL(*this, Warning).WillByDefault([](auto message) {
+                std::cout << message << std::endl;
+            });
+            ON_CALL(*this, Error).WillByDefault([](auto message) {
+                std::cerr << message << std::endl;
+            });
+        }
+    }
 };
 
 class AirlockTest : public testing::Test
@@ -75,7 +95,7 @@ protected:
 
 TEST_F(AirlockTest, TransitionToInsideOpen_Ok)
 {
-    testing::NiceMock<MockLogger> logger{};
+    testing::NiceMock<MockLogger> logger{}; // provide true argument to log to stdout
     example::MyAirlock airlock{example::AirlockDependencies{
         .doorInside = mockDoorInside,
         .doorOutside = mockDoorOutside,
@@ -90,7 +110,7 @@ TEST_F(AirlockTest, TransitionToInsideOpen_Ok)
 
 TEST_F(AirlockTest, TransitionToInsideOpen_FailureWhileEvacuating)
 {
-    testing::NiceMock<MockLogger> logger{};
+    testing::NiceMock<MockLogger> logger{}; // provide true argument to log to stdout
     example::MyAirlock airlock{example::AirlockDependencies{
         .doorInside = mockDoorInside,
         .doorOutside = mockDoorOutside,
@@ -106,5 +126,5 @@ TEST_F(AirlockTest, TransitionToInsideOpen_FailureWhileEvacuating)
     auto result = insideOpenFuture.get(); // Wait for future
 
     ASSERT_FALSE(result.has_value());
-    ASSERT_STREQ("Vacuum state changed to unknown state: 0\n", result.error().c_str());
+    ASSERT_STREQ("Vacuum state changed to unknown state: 0", result.error().c_str());
 }

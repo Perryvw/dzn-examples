@@ -12,6 +12,8 @@
 #include "glue/injected/ErrorHelper.hpp"
 #include "glue/injected/Logging.hpp"
 
+#include "glue/custom-dzn-logging.hpp"
+
 namespace example {
 
 class AirlockImpl
@@ -21,11 +23,14 @@ public:
         : m_doorInside{m_dzn_pump, dependencies.doorInside},
         m_doorOutside{m_dzn_pump, dependencies.doorOutside},
         m_vacuum{m_dzn_pump, dependencies.vacuum},
-        m_logging{logger}
+        m_logging{logger},
+        m_dznLogging{[&logger](const std::string& m) { logger.Debug(m); }}
     {
         // Add runtime and pump to locator
         m_dzn_locator.set(m_dzn_runtime);
         m_dzn_locator.set(m_dzn_pump);
+
+        m_dzn_locator.set<std::ostream>(m_dznLogging);
 
         // Add injected glue to locator
         m_dzn_locator.set(m_errorHelper.port());
@@ -90,6 +95,8 @@ private:
 
     glue::injected::ErrorHelper m_errorHelper;
     glue::injected::Logging m_logging;
+
+    CustomDznLogging m_dznLogging;
 };
 
 MyAirlock::MyAirlock(AirlockDependencies dependencies, ILogger& logger)

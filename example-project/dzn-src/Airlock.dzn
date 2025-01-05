@@ -4,6 +4,19 @@ import components/IVacuum.dzn;
 
 namespace example.dezyne {
 
+/*
+ * This component represents a simple airlock used to transfer something from
+ * outside (at ambient air pressure) into a a vacuum environment, without having
+ * to re-evacuate the entire vacuum. Instead, it works by having two doors, one
+ * on the outside (ambient pressure), and one on the inside (vacuum). It also has
+ * its own vacuum system connected to vent/evacuate the loadlock.
+ *
+ * To prevent sudden rushes of air, we must observe a few rules:
+ *
+ * The inside door must ONLY be opened when the loadlock is in vacuum.
+ * The outside door must ONLY be opened to when the loadlock is at ambient pressure.
+ * The doors must NEVER be open at the same time.
+ */
 component Airlock
 {
     provides IAirlock api;

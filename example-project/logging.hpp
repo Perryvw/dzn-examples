@@ -6,6 +6,7 @@
  * an existing logging interface might be integrated into dezyne code */
 class ILogger {
 public:
+    virtual void Debug(const std::string& message) const = 0;
     virtual void Info(const std::string& message) const = 0;
     virtual void Warning(const std::string& message) const = 0;
     virtual void Error(const std::string& message) const = 0;
