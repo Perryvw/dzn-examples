@@ -2,6 +2,7 @@ import Airlock.dzn;
 import armor/AirlockArmor.dzn;
 import armor/DoorArmor.dzn;
 import armor/VacuumArmor.dzn;
+import utils/promise.dzn;
 import utils/timer.dzn;
 
 namespace example.dezyne {

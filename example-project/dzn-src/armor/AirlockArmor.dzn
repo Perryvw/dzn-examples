@@ -1,6 +1,8 @@
 import external/IAirlockExternal.dzn;
 import IAirlock.dzn;
 
+import utils/promise.dzn;
+
 namespace example.dezyne.armor {
 
 component AirlockArmor
