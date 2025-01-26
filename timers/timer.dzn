@@ -1,0 +1,47 @@
+extern Milliseconds $std::chrono::milliseconds$;
+
+namespace utils {
+
+interface ITimer
+{
+    // Start timer with a given duration in milliseconds
+    in void Start(in Milliseconds durationMs);
+
+    // Cancel the ongoing timer
+    in void Cancel();
+
+    // Timer duration has elapsed and timer is finished
+    out void Timeout();
+
+    behavior
+    {
+        enum State
+        {
+            Inactive,
+            Pending
+        };
+
+        State state = State.Inactive;
+
+        [state.Inactive]
+        {
+            on Start: state = State.Pending;
+        }
+
+        [state.Pending]
+        {
+            // User can cancel the timer once started
+            on Cancel: state = State.Inactive;
+
+            // Timer will inevitably complete
+            on inevitable: { Timeout; state = State.Inactive; }
+        }
+    }
+}
+
+component Timer
+{
+    provides ITimer api;
+}
+
+}
