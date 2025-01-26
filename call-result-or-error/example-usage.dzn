@@ -1,0 +1,69 @@
+// Import result & error types
+import result.dzn;
+
+interface ICanFail
+{
+    // Calls that can possibly fail, and if it does will fill the out Error
+    in Result MethodThatCanFail(out Error error);
+    in Result OtherMethodThatCanFail(out Error error);
+
+    // Out event containing error information
+    out void Fail(in Error error);
+}
+
+component ComponentCanFail
+{
+    // A provided port that has methods that can fail
+    provides ICanFail api;
+
+    // A required port that has methods that can fail
+    requires ICanFail reqPort;
+
+    // We need the error helper to manipulate errors
+    requires injected ErrorHelper errorHelper;
+
+    behavior
+    {
+        on api.MethodThatCanFail(error):
+        {
+            // Try to call method on our required port
+            if (reqPort.MethodThatCanFail(error) == Result.Ok)
+            {
+                // Required port returned Ok do a next step here then reply Ok to our client
+                reply(Result.Ok);
+            }
+            else
+            {
+                // Call to required port failed, error contains error information
+
+                // We can add more information to build a trace of the error situation
+                errorHelper.AddMessage(error, $"Error while calling reqPort during example!"$);
+
+                // Indicate to our client that something went wrong
+                reply(Result.Ok);
+            }
+        }
+
+        // Use function to handle the call
+        on api.OtherMethodThatCanFail(error): reply(OtherMethodThatCanFail(error));
+
+        // Function definition returning a Result and error information, this allows early returns:
+        Result OtherMethodThatCanFail(out Error error)
+        {
+            // Call required port
+            if (reqPort.MethodThatCanFail(error) == Result.Ok)
+            {
+                return Result.Error;
+            }
+
+            // First call succeeded, do second call
+            if (reqPort.OtherMethodThatCanFail(error))
+            {
+                return Result.Error;
+            }
+
+            // Both calls succeeded, return Ok
+            return Result.Ok;
+        }
+    }
+}
