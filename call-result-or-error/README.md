@@ -4,7 +4,7 @@ Since Dezyne has neither exceptions nor structured return types, this pattern is
 
 The short summary of how this works is:
 
-```dzn
+```cpp
 enum Result
 {
     Ok,
@@ -47,7 +47,7 @@ Dezyne abstracts away data, also for errors so these are usually stored as exter
 
 One common way to store and propagate error information is using some external data structure and an injected helper interface:
 
-```dzn
+```cpp
 extern Error $Dzn::Error$;
 
 namespace utils {
@@ -69,9 +69,9 @@ interface ErrorHelper
 
 Usage of this pattern then looks like this in code:
 
-```dzn
-Result TryAB(out Error error) {
-
+```cpp
+Result TryAB(out Error error)
+{
     // error already contains the failure info from a, add some more info
     if (a.Try(error) == Result.Error) {
         errorHelper.AddMessage(error, $"AB failed while trying A"$);

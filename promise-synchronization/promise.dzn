@@ -1,0 +1,82 @@
+extern DataType $std::any$;
+extern Error $Dzn::Error$;
+extern Future $std::shared_future<std::expected<std::any, Dzn::Error>>$;
+
+$#include <any>$
+$#include <expected>$
+$#include <future>$
+
+interface IPromise
+{
+    // Start a pending operation that we promise to resolve
+    in void Start();
+
+    // Check if this promise is currently pending or not
+    in bool IsPending();
+
+    // Create a future that is already resolved, without data
+    in void CreateResolved(out Future future);
+
+    // Create a future that is already resolved, with data
+    in void CreateResolvedData(in DataType data, out Future future);
+
+    // Create a future that is already failed, with given error
+    in void CreateFailed(in Error error, out Future future);
+
+    // Create a future that is pending completion
+    in void CreatePending(out Future future);
+
+    // Resolve pending promise successfully without data
+    in void Resolve();
+
+    // Resolve pending promise successfully with data
+    in void ResolveData(in DataType data);
+
+    // Fail pending promise
+    in void Fail(in Error error);
+
+    behavior
+    {
+        enum State
+        {
+            Inactive,
+            Pending
+        };
+
+        State state = State.Inactive;
+
+        [state.Inactive]
+        {
+            on IsPending: reply(false);
+
+            on Start: { // Starting the operation means we promise to resolve our futures
+                state = State.Pending; }
+
+            // Non-pending futures can be created at any time, but pending futures
+            // can only be handed out while our promise is pending!
+            on CreateResolved, CreateResolvedData, CreateFailed: {}
+        }
+
+        [state.Pending]
+        {
+            on IsPending: reply(true);
+
+            // Promise can be resolved in this state, causing us to go back to inactive
+            on Resolve, ResolveData, Fail: { state = State.Inactive; }
+
+            // In this state we can hand out pending futures!
+            on CreatePending: {}
+
+            // We can still create non-pending futures
+            on CreateResolved, CreateResolvedData, CreateFailed: {}
+        }
+    }
+}
+
+namespace utils
+{
+component PromiseFC
+{
+    provides IPromise api;
+}
+}
