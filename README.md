@@ -1,6 +1,6 @@
 This repository contains examples and often occurring patterns encountered while developing software with [Dezyne](https://dezyne.org/).
 
-> Note: These examples were made using Dezyne 2.18.3 and C++20, and may require changes for other versions.
+> Note: These examples were made using Dezyne 2.18.3 and C++23, and may require changes for other versions.
 
 ## Project Template
 
