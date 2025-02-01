@@ -1,15 +1,17 @@
-# Synchronizing asynchronous actions
-
-The Dezyne language models every action that does not synchronously return as an asynchronous action, meaning at some later point there will be an event notifying that the event has finished (or failed).
-
 The pattern presented here:
 * Allows you to synchronize long-running Dezyne actions without blocking the Dezyne pump
 * Allows you to give your clients promise(/future) objects that they can decide how to synchronize on
 * Uses the Dezyne verification to prevent you accidentally creating a deadlock or exception
 
+# Synchronizing asynchronous actions
+
+The Dezyne language models every action that does not synchronously return as an asynchronous action, meaning at some later point there will be an event notifying that the event has finished (or failed).
+
+On our interfaces however, it is usually very convenient to be able to get a notification when the action you requested has finished. This can be done using events or callbacks, but a more modern way of doing this is with promises.
+
 ## Promises (and futures)
 
-On our interfaces however, it is usually very convenient to be able to get a notification when the action you requested has finished. This can be done using events or callbacks, but a more modern way of doing this is with promises. In this pattern, the long-running action specifies in its signature that it will take a while, and that it _promises_ to notify the requester when the action is done. In C++ the requester recieves a `std::future` object that will get notified when the promise is resolved:
+In this pattern, the long-running action explicitly specifies in its signature that it will take a while, and that it _promises_ to notify the requester when the action is done. This is made explicit by returning a `future` object. In C++ the requester recieves a `std::future` (or `std::shared_future`) object that will get notified when the promise is resolved, and which can be used to synchronize on:
 
 ```c++
 // Request doing some long action, which returns a future that will be resolved when done
@@ -66,7 +68,7 @@ When everything is set up in this way, you can call the synchronizing function i
 ```cpp
 void CallSynchronizingFunction() {
     // Call Dezyne function with local shared_future to write
-    std::shared_future<dezyne::utils::PromiseFC::PromiseResult> future;
+    std::shared_future<utils::PromiseFC::PromiseResult> future;
     dzn_system->SynchronizingFunction(future);
 
     // Synchronize on the future by calling .get(), blocking until the future is resolved
